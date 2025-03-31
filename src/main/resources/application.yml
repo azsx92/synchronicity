@@ -9,7 +9,8 @@ spring:
     hikari:
       username: root
       password: 1234
-      maximum-pool-size: 40
+      hikari:
+        maximum-pool-size: 40
 
 logging:
   level:
