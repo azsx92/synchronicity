@@ -94,5 +94,20 @@ Named Lock
 https://dev.mysql.com/doc/refman/8.0/en/
 https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
 https://dev.mysql.com/doc/refman/8.0/en/metadata-locking.html
+```
 
+### Redis 라이브러리
+
+#### Lettuce
+- setnx  명령어를 활용하여 분산락 구현
+- spin lock 방식
+
+#### Redission
+- pub-sub 기반으로 Lock 구현 제공
+
+### Redis 작업환경 셋팅
+```text
+docker pull redis
+
+docker run --name myredis -d -p 6379:6379 redis
 ```
