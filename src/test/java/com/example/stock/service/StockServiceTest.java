@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class StockServiceTest {
@@ -35,6 +39,34 @@ class StockServiceTest {
         Stock stock = stockRepository.findById(1L).orElseThrow();
 
         assertEquals(99, stock.getQuantity());
+    }
+
+    @Test
+    public void 동시에_100개의_요청() throws InterruptedException {
+        int threadCount = 100;
+
+        // 스레드 요청서비스를 가능하게 해주는 API
+        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        // 스레드가 끝날 때까지 대기해주는 클래스
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        for(int i = 0; i < threadCount; i++){
+            executorService.submit(() -> {
+                try {
+                    stockService.decrease(1L,1L);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        Stock stock = stockRepository.findById(1L).orElseThrow();
+        // 100 - (1 * 100) = 0
+        assertEquals(0, stock.getQuantity());
+
+        // 레이스 컨디션 정리하기
     }
 
 }
